@@ -44,9 +44,11 @@ namespace simpleRPG
             if (Fighters.All(x => x.IsAlive())) {
                 Console.WriteLine("\nYou lost! :(");
                 int moneyLoss = 6;
+                money += moneyGain;
             } else if (mobs.All(x => x.IsAlive())) {
                 Console.WriteLine("\nYou won! :D");
                 int moneyGain = 5;
+                money += moneyGain;
             }
         }
     }
