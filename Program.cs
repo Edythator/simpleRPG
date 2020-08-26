@@ -28,7 +28,7 @@ namespace simpleRPG
             {
                 if (turn)
                 {
-                    //scale crit dmg with total dmg
+                    // implement scaling amount of crit derived from the total CP the character can do
                     mobs[0].HP -= Rnd.Next(Fighters[0].CP - 2, Fighters[0].CP + 2);
                     Thread.Sleep(1000);
                     turn = false;
@@ -44,7 +44,7 @@ namespace simpleRPG
             if (Fighters.All(x => x.IsAlive())) {
                 Console.WriteLine("\nYou lost! :(");
                 int moneyLoss = 6;
-                money += moneyGain;
+                money -= moneyLoss;
             } else if (mobs.All(x => x.IsAlive())) {
                 Console.WriteLine("\nYou won! :D");
                 int moneyGain = 5;
