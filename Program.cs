@@ -12,6 +12,7 @@ namespace simpleRPG
         //TODO: implement randomization and management of mobs/fighters
         //TODO: implement functions to scale mobs to fighter levels
         //TODO: implement saving
+        //TODO: fix this horrible codebase
 
         public static Random Rnd = new Random();
 
@@ -21,19 +22,23 @@ namespace simpleRPG
         {
             bool turn = true;
             int money = 100;
+
             Fighters[0] = new Fighter("Green", 10, 10, 1, 1, "hey");
             Fighter mainFighter = Fighters[0];
-            Mob[] mobs = new Mob[1] { new Mob() };
+            Mob[] mobs = new Mob[2];
+            for (int i = 0; i < mobs.Length; i++)
+                mobs[i] = new Mob();
 
             while (Fighters.Where(x => x != null).All(x => x.HP > 0) && mobs.All(x => x.HP > 0))
             {
                 Console.Clear();
-                Console.WriteLine("What do you want to do? (m/c)");
+
+                Console.WriteLine("What do you want to do? (c(ontinue)/m(anage))");
                 char c = Console.ReadKey().KeyChar;
                 if (c == 'm' || c == 'M')
                 {
                     Console.Clear();
-                    Console.WriteLine("What do you want to do? (s/r/b)");
+                    Console.WriteLine("What do you want to do? (s(wap)/r(ename)/b(ack))");
                     char sc = Console.ReadKey().KeyChar;
                     if (sc == 's' || sc == 'S')
                     {
