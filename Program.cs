@@ -25,13 +25,12 @@ namespace simpleRPG
             Fighter mainFighter = Fighters[0];
             Mob[] mobs = new Mob[1] { new Mob() };
 
-            Console.WriteLine("Hello. Welcome to the dungeon. Let's continue, shall we?");
             while (Fighters.Where(x => x != null).All(x => x.HP > 0) && mobs.All(x => x.HP > 0))
             {
                 Console.Clear();
                 Console.WriteLine("What do you want to do? (m/c)");
                 char c = Console.ReadKey().KeyChar;
-                if (c == 'm' || c == 'm')
+                if (c == 'm' || c == 'M')
                 {
                     Console.Clear();
                     Console.WriteLine("What do you want to do? (s/r/b)");
@@ -44,12 +43,11 @@ namespace simpleRPG
                             Console.WriteLine($"{i}: {f.Name}");
                             i++;
                         }
-                        Console.WriteLine("Which fighter do you want to pick?");
+                        Console.WriteLine("\nWhich fighter do you want to pick?");
                         char pick = Console.ReadKey().KeyChar;
                         if (int.TryParse(pick.ToString(), out int j))
                         {
-                            Fighter oldMain;
-                            oldMain = mainFighter;
+                            Fighter oldMain = mainFighter;
                             mainFighter = Fighters[j - 1];
                             Fighters[j - 1] = oldMain;
                         }
@@ -58,16 +56,17 @@ namespace simpleRPG
                     else if (sc == 'r' || sc == 'R')
                     {
                         int i = 1;
-                        foreach (Fighter f in Fighters)
+                        Console.Clear();
+                        foreach (Fighter f in Fighters.Where(x => x != null))
                         {
                             Console.WriteLine($"{i}: {f.Name}");
                             i++;
                         }
-                        Console.WriteLine("Which fighter do you want to rename?");
+                        Console.WriteLine("\nWhich fighter do you want to rename?");
                         char pick = Console.ReadKey().KeyChar;
                         if (int.TryParse(pick.ToString(), out int j))
                         {
-                            Console.WriteLine("What do you want to rename it to?");
+                            Console.WriteLine("\nWhat do you want to rename it to?");
                             Fighters[j - 1].Nickname = Console.ReadLine();
                         }
                         else continue;
@@ -76,7 +75,7 @@ namespace simpleRPG
                         continue;
                     else
                     {
-                        Console.WriteLine("You entered an invalid choice. Returning...");
+                        Console.WriteLine("\nYou entered an invalid choice. Returning...");
                         continue;
                     };
                 }
@@ -87,9 +86,9 @@ namespace simpleRPG
                     int damage = Rnd.Next(Fighters[0].CP - 2, Fighters[0].CP + 2);
                     mobs[0].HP -= damage;
                     if (mainFighter.Nickname == "")
-                        Console.WriteLine($"{mainFighter.Name} did {damage} damage to {mobs[0].Name}!\n {mobs[0].Name} now has {mobs[0].HP} HP left.\n");
+                        Console.WriteLine($"\n{mainFighter.Name} did {damage} damage to {mobs[0].Name}!\n {mobs[0].Name} now has {mobs[0].HP} HP left.\n");
                     else
-                        Console.WriteLine($"{mainFighter.Nickname} ({mainFighter.Name}) did {damage} damage to {mobs[0].Name}!\n {mobs[0].Name} now has {mobs[0].HP} HP left.\n");
+                        Console.WriteLine($"\n{mainFighter.Nickname} ({mainFighter.Name}) did {damage} damage to {mobs[0].Name}!\n {mobs[0].Name} now has {mobs[0].HP} HP left.\n");
                     Thread.Sleep(1000);
                     turn = false;
                 }
@@ -97,9 +96,9 @@ namespace simpleRPG
                 {
                     int damage = Rnd.Next(mobs[0].CP - 2, mobs[0].CP + 2);
                     if (mainFighter.Nickname == "")
-                        Console.WriteLine($"{mobs[0].Name} did {damage} damage to {mainFighter.Name}!\n {mainFighter.Name} now has {mainFighter.HP} HP left.\n");
+                        Console.WriteLine($"\n{mobs[0].Name} did {damage} damage to {mainFighter.Name}!\n {mainFighter.Name} now has {mainFighter.HP} HP left.\n");
                     else
-                        Console.WriteLine($"{mobs[0].Name} did {damage} damage to {mainFighter.Nickname} ({mainFighter.Name})!\n {mainFighter.Nickname} now has {mainFighter.HP} HP left.\n");
+                        Console.WriteLine($"\n{mobs[0].Name} did {damage} damage to {mainFighter.Nickname} ({mainFighter.Name})!\n {mainFighter.Nickname} now has {mainFighter.HP} HP left.\n");
                     mainFighter.HP -= damage;
                     Thread.Sleep(1000);
                     turn = true;
