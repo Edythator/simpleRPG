@@ -26,7 +26,7 @@ namespace simpleRPG
             Mob[] mobs = new Mob[1] { new Mob() };
 
             Console.WriteLine("Hello. Welcome to the dungeon. Let's continue, shall we?");
-            while (Fighters.All(x => x != null && x.HP > 0) && mobs.All(x => x.HP > 0))
+            while (Fighters.Where(x => x != null).All(x => x.HP > 0) && mobs.All(x => x.HP > 0))
             {
                 Console.Clear();
                 Console.WriteLine("What do you want to do? (m/c)");
@@ -106,7 +106,7 @@ namespace simpleRPG
                 }
             }
 
-            if (Fighters.All(x => x != null && x.IsAlive())) {
+            if (Fighters.Where(x => x != null).All(x => x.IsAlive())) {
                 Console.WriteLine("\nYou lost! :(");
                 int moneyLoss = 6;
                 money -= moneyLoss;
