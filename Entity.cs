@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace simpleRPG
+﻿namespace simpleRPG
 {
-    class Entity
+    public abstract class Entity
     {
         public string Name;
         public int HP;

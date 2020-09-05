@@ -1,25 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace simpleRPG
+﻿namespace simpleRPG
 {
-    class Fighter : Entity
+    public class Fighter : Entity
     {
-        public string Nickname;
-        public int CP;
-        public int Level;
-        public int XP;
-        public string Faction;
+        public string Nickname { get; set; }
+        public int CP { get; private set; }
+        public int Level { get; private set; }
+        public int XP { get; private set; }
+        public string Faction { get; private set; }
 
         public Fighter(string name, int hp, int cp, int level, int xp, string faction) : base(name, hp)
         {
-            Nickname = "";
             CP = cp;
             Level = level;
             XP = xp;
             Faction = faction;
+        }
+        public string GetPrintableName()
+        {
+            if (!string.IsNullOrEmpty(Nickname))
+                return Nickname;
+            return Name;
         }
     }
 }

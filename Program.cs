@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace simpleRPG
@@ -9,115 +7,95 @@ namespace simpleRPG
     class Program
     {
         //TODO: implement some kind of function to calculate amount of money loss&gain scaled to level
-        //TODO: implement randomization and management of mobs/fighters
         //TODO: implement functions to scale mobs to fighter levels
-        //TODO: implement saving
-        //TODO: fix this horrible codebase
+        //TODO: implement finding fighters n stuff
 
         public static Random Rnd = new Random();
-
-        // make sure to not forget to initalize the fighters, the program is useless in its current form without this functionality
-        public static Fighter[] Fighters = new Fighter[5];
+        public static FighterManager fighterManager = new FighterManager();
         static void Main(string[] args)
         {
+            fighterManager.LoadFighters();
             bool turn = true;
-            int money = 100;
+            int money = 100; 
 
-            Fighters[0] = new Fighter("Green", 10, 10, 1, 1, "hey");
-            Fighter mainFighter = Fighters[0];
             Mob[] mobs = new Mob[2];
             for (int i = 0; i < mobs.Length; i++)
                 mobs[i] = new Mob();
 
-            while (Fighters.Where(x => x != null).All(x => x.HP > 0) && mobs.All(x => x.HP > 0))
+            while (fighterManager.IsPartyAlive() && mobs.All(x => x.IsAlive()))
             {
                 Console.Clear();
-
                 Console.WriteLine("What do you want to do? (c(ontinue)/m(anage))");
-                char c = Console.ReadKey().KeyChar;
-                if (c == 'm' || c == 'M')
+                char c = char.ToLower(Console.ReadKey().KeyChar);
+                if (c == 'm')
                 {
                     Console.Clear();
-                    Console.WriteLine("What do you want to do? (s(wap)/r(ename)/b(ack))");
-                    char sc = Console.ReadKey().KeyChar;
-                    if (sc == 's' || sc == 'S')
-                    {
-                        int i = 1;
-                        foreach (Fighter f in Fighters)
-                        {
-                            Console.WriteLine($"{i}: {f.Name}");
-                            i++;
-                        }
-                        Console.WriteLine("\nWhich fighter do you want to pick?");
-                        char pick = Console.ReadKey().KeyChar;
-                        if (int.TryParse(pick.ToString(), out int j))
-                        {
-                            Fighter oldMain = mainFighter;
-                            mainFighter = Fighters[j - 1];
-                            Fighters[j - 1] = oldMain;
-                        }
-                        else continue;
-                    }
-                    else if (sc == 'r' || sc == 'R')
-                    {
-                        int i = 1;
-                        Console.Clear();
-                        foreach (Fighter f in Fighters.Where(x => x != null))
-                        {
-                            Console.WriteLine($"{i}: {f.Name}");
-                            i++;
-                        }
-                        Console.WriteLine("\nWhich fighter do you want to rename?");
-                        char pick = Console.ReadKey().KeyChar;
-                        if (int.TryParse(pick.ToString(), out int j))
-                        {
-                            Console.WriteLine("\nWhat do you want to rename it to?");
-                            Fighters[j - 1].Nickname = Console.ReadLine();
-                        }
-                        else continue;
-                    }
-                    else if (sc == 'b' || sc == 'B')
-                        continue;
-                    else
-                    {
-                        Console.WriteLine("\nYou entered an invalid choice. Returning...");
-                        continue;
-                    };
-                }
+                    Console.WriteLine("What do you want to do? (s(wap)/r(ename)/p(rint)/b(ack))");
+                    char sc = char.ToLower(Console.ReadKey().KeyChar);
 
-                if (turn)
-                {
-                    // implement scaling amount of crit derived from the total CP the character can do
-                    int damage = Rnd.Next(Fighters[0].CP - 2, Fighters[0].CP + 2);
-                    mobs[0].HP -= damage;
-                    if (mainFighter.Nickname == "")
-                        Console.WriteLine($"\n{mainFighter.Name} did {damage} damage to {mobs[0].Name}!\n {mobs[0].Name} now has {mobs[0].HP} HP left.\n");
-                    else
-                        Console.WriteLine($"\n{mainFighter.Nickname} ({mainFighter.Name}) did {damage} damage to {mobs[0].Name}!\n {mobs[0].Name} now has {mobs[0].HP} HP left.\n");
-                    Thread.Sleep(1000);
-                    turn = false;
+                    if (sc == 's')
+                    {
+                        fighterManager.PrintFighters();
+                        Console.WriteLine("\nWho do you want to swap to?");
+
+                        if (int.TryParse(Console.ReadKey().KeyChar.ToString(), out int idx))
+                            fighterManager.Select(idx);
+                        else continue;
+                    }
+                    else if (sc == 'r')
+                    {
+                        Console.WriteLine($"\nWhat do you want {fighterManager.selectedFighter.Name}'s nickname to be?");
+                        string nickname = Console.ReadLine();
+                        if (nickname == ";")
+                        {
+                            Console.WriteLine("Invalid nickname.");
+                            continue;
+                        }
+
+                        fighterManager.selectedFighter.Nickname = Console.ReadLine();
+                    }
+                    else if (sc == 'p')
+                    {
+                        fighterManager.PrintFighters();
+                        Console.WriteLine("Press any key to go back...");
+                        Console.ReadKey();
+                    }
+                    else continue;
                 }
                 else
                 {
-                    int damage = Rnd.Next(mobs[0].CP - 2, mobs[0].CP + 2);
-                    if (mainFighter.Nickname == "")
-                        Console.WriteLine($"\n{mobs[0].Name} did {damage} damage to {mainFighter.Name}!\n {mainFighter.Name} now has {mainFighter.HP} HP left.\n");
+                    string name = fighterManager.selectedFighter.GetPrintableName();
+                    Mob selectedMob = mobs.OrderBy(x => x.HP).First();
+                    if (turn)
+                    {
+                        // implement scaling amount of crit derived from the total CP the character can do and chance of crit
+                        int damage = Rnd.Next(fighterManager.selectedFighter.CP - 2, fighterManager.selectedFighter.CP + 2);
+                        selectedMob.HP -= damage;
+                        Console.WriteLine($"\n{name} did {damage} damage to {selectedMob.Name}!\n {name} now has {selectedMob.HP} HP left.\n");
+                        Thread.Sleep(1000);
+                        turn = false;
+                    }
                     else
-                        Console.WriteLine($"\n{mobs[0].Name} did {damage} damage to {mainFighter.Nickname} ({mainFighter.Name})!\n {mainFighter.Nickname} now has {mainFighter.HP} HP left.\n");
-                    mainFighter.HP -= damage;
-                    Thread.Sleep(1000);
-                    turn = true;
+                    {
+                        int damage = Rnd.Next(selectedMob.CP - 2, selectedMob.CP + 2);
+                        Console.WriteLine($"\n{selectedMob} did {damage} damage to {name}!\n {name} now has {fighterManager.selectedFighter.HP} HP left.\n");
+                        fighterManager.selectedFighter.HP -= damage;
+                        Thread.Sleep(1000);
+                        turn = true;
+                    }
+                    fighterManager.SaveFighters();
                 }
+
             }
 
-            if (Fighters.Where(x => x != null).All(x => x.IsAlive())) {
-                Console.WriteLine("\nYou lost! :(");
-                int moneyLoss = 6;
-                money -= moneyLoss;
-            } else if (mobs.All(x => x.IsAlive())) {
+            if (fighterManager.IsPartyAlive()) {
                 Console.WriteLine("\nYou won! :D");
                 int moneyGain = 5;
                 money += moneyGain;
+            } else {
+                Console.WriteLine("\nYou lost! :(");
+                int moneyLoss = 6;
+                money -= moneyLoss;
             }
         }
     }
