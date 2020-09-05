@@ -15,6 +15,14 @@
             XP = xp;
             Faction = faction;
         }
+        public Fighter(string name, string nickname, int hp, int cp, int level, int xp, string faction) : base(name, hp)
+        {
+            Nickname = nickname;
+            CP = cp;
+            Level = level;
+            XP = xp;
+            Faction = faction;
+        }
         public string GetPrintableName()
         {
             if (!string.IsNullOrEmpty(Nickname))
