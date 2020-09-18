@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 namespace simpleRPG
@@ -13,16 +11,16 @@ namespace simpleRPG
         //TODO: fix some kind of "encryption" for saving
 
         public static Random Rnd = new Random();
-
-        static void Main(string[] args)
+        public static FighterManager FighterManager = new FighterManager();
+        private static void Main(string[] args)
         {
             MobManager mobManager = new MobManager();
-            FighterManager fighterManager = new FighterManager();
-            fighterManager.LoadFighters();
+            FighterManager.LoadFighters();
             mobManager.ConstructMobs();
             bool turn = true;
             int money = 100;
-            while (fighterManager.IsPartyAlive() && mobManager.MobsAlive())
+
+            while (FighterManager.IsPartyAlive() && mobManager.MobsAlive())
             {
                 Console.Clear();
                 Console.WriteLine("What do you want to do? (c(ontinue)/m(anage))");
@@ -35,16 +33,16 @@ namespace simpleRPG
 
                     if (sc == 's')
                     {
-                        fighterManager.PrintFighters();
+                        FighterManager.PrintFighters();
                         Console.WriteLine("\nWho do you want to swap to?");
 
                         if (int.TryParse(Console.ReadKey().KeyChar.ToString(), out int idx))
-                            fighterManager.Select(idx - 1);
+                            FighterManager.Select(idx - 1);
                         else continue;
                     }
                     else if (sc == 'r')
                     {
-                        Console.WriteLine($"\nWhat do you want {fighterManager.selectedFighter.Name}'s nickname to be?");
+                        Console.WriteLine($"\nWhat do you want {FighterManager.selectedFighter.Name}'s nickname to be?");
                         string nickname = Console.ReadLine();
                         if (nickname == ";")
                         {
@@ -52,11 +50,11 @@ namespace simpleRPG
                             Thread.Sleep(1000);
                             continue;
                         }
-                        fighterManager.selectedFighter.Nickname = nickname;
+                        FighterManager.selectedFighter.Nickname = nickname;
                     }
                     else if (sc == 'p')
                     {
-                        fighterManager.PrintFighters();
+                        FighterManager.PrintFighters();
                         Console.WriteLine("Press any key to go back...");
                         Console.ReadKey();
                     }
@@ -64,46 +62,40 @@ namespace simpleRPG
                 }
                 else
                 {
-                    string name = fighterManager.selectedFighter.GetPrintableName();
+                    string name = FighterManager.selectedFighter.GetPrintableName();
                     if (turn)
                     {
-                        // implement scaling amount of crit derived from the total CP the character can do and chance of crit
-                        int damage = Rnd.Next(fighterManager.selectedFighter.CP - 2, fighterManager.selectedFighter.CP + 2);
-                        if (mobManager.selectedMob.HP - damage < 0)
-                            damage = mobManager.selectedMob.HP;
-                        mobManager.selectedMob.HP -= damage;
+                        FighterManager.selectedFighter.Fight(mobManager.selectedMob, out int damage);
 
-                        Console.WriteLine($"\n{name} did {damage} damage to {mobManager.selectedMob.Name}!\n {mobManager.selectedMob.Name} now has {mobManager.selectedMob.HP} HP left.");
+                        Console.WriteLine($"\n{name} did {damage} damage to {mobManager.selectedMob.Name}!\n{mobManager.selectedMob.Name} now has {mobManager.selectedMob.HP} HP left.");
                         Thread.Sleep(1000);
                         turn = false;
                     }
                     else
                     {
-                        int damage = Rnd.Next(mobManager.selectedMob.CP - 2, mobManager.selectedMob.CP + 2);
-                        if (fighterManager.selectedFighter.HP - damage < 0)
-                            damage = fighterManager.selectedFighter.HP;
-                        fighterManager.selectedFighter.HP -= damage;
+                        FighterManager.selectedFighter.Fight(FighterManager.selectedFighter, out int damage);
 
-                        Console.WriteLine($"\n{mobManager.selectedMob.Name} did {damage} damage to {name}!\n {name} now has {fighterManager.selectedFighter.HP} HP left.");
+                        Console.WriteLine($"\n{mobManager.selectedMob.Name} did {damage} damage to {name}!\n{name} now has {FighterManager.selectedFighter.HP} HP left.");
                         Thread.Sleep(1000);
                         turn = true;
                     }
-                    fighterManager.SaveFighters();
+                    FighterManager.SaveFighters();
                 }
-
             }
 
-            if (fighterManager.IsPartyAlive())
+            if (FighterManager.IsPartyAlive())
             {
                 Console.WriteLine("\nYou won! :D");
-                int moneyGain = 5;
+                int moneyGain = (int)(money * 0.03);
                 money += moneyGain;
+                Console.WriteLine("\nYou gained " + moneyGain + " money.");
             }
             else
             {
                 Console.WriteLine("\nYou lost! :(");
-                int moneyLoss = 6;
+                int moneyLoss = (int)(money * 0.03);
                 money -= moneyLoss;
+                Console.WriteLine("\nYou lost " + moneyLoss + " money.");
                 Console.WriteLine("Game will automatically exit in 2 seconds...");
                 Thread.Sleep(2000);
                 return;

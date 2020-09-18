@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
-using System.Linq.Expressions;
-using System.Diagnostics;
 
 namespace simpleRPG
 {
     class FighterManager
     {
         public Fighter selectedFighter { get; private set; }
-        private static List<Fighter> fighters = new List<Fighter>();
+        private List<Fighter> fighters = new List<Fighter>();
         public void LoadFighters()
         {
             try
@@ -35,6 +32,8 @@ namespace simpleRPG
                     }
                 }
             }
+
+            catch (IOException) { }
 
             catch (Exception e)
             {
@@ -66,22 +65,22 @@ namespace simpleRPG
                 Console.WriteLine("Caught exception: " + e.Message);
             }
         }
-        public static int GetFighterCount() => fighters.Count;
-        public static int GetFighterAverageHP()
+        public int GetFighterCount() => fighters.Count;
+        public int GetFighterAverageHP()
         {
             int averageHP = 0;
             foreach (Fighter f in fighters)
                 averageHP += f.HP;
             return averageHP / GetFighterCount();
         }
-        public static int GetFighterAverageCP()
+        public int GetFighterAverageCP()
         {
             int averageCP = 0;
             foreach (Fighter f in fighters)
                 averageCP += f.CP;
             return averageCP / GetFighterCount();
         }
-        public static int GetHighestLevelFighter() => fighters.OrderByDescending(x => x.Level).First().Level;
+        public int GetHighestLevelFighter() => fighters.OrderByDescending(x => x.Level).First().Level;
         public Fighter Create(string name, int hp, int cp, int level, int xp, string faction)
         {
             Fighter f = new Fighter(name, hp, cp, level, xp, faction);
@@ -94,7 +93,6 @@ namespace simpleRPG
             fighters.Add(f);
             return f;
         }
-
         public void PrintFighters()
         {
             Console.Clear();
@@ -106,14 +104,8 @@ namespace simpleRPG
                     Console.WriteLine($"{i + 1}: [{fighters[i].Faction}] {fighters[i].Nickname} ({fighters[i].Name}) | HP: {fighters[i].HP} | CP: {fighters[i].CP} | Level: {fighters[i].Level} | XP: {fighters[i].XP}");
             }
         }
-        public void Select(int fighterIdx)
-        {
-            selectedFighter = fighters[fighterIdx];
-        }
-        public void Select(Fighter f)
-        {
-            selectedFighter = f;
-        }
+        public void Select(int fighterIdx) => selectedFighter = fighters[fighterIdx];
+        public void Select(Fighter f) => selectedFighter = f;
         public bool IsPartyAlive() => fighters.All(x => x.IsAlive());
     }
 }

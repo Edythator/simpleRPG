@@ -2,9 +2,8 @@
 {
     class Mob : Entity
     {
-        public int CP;
         public int Level;
-        public Mob(string name, int hp, int cp, int level) : base(name, hp)
+        public Mob(string name, int hp, int cp, int level) : base(name, hp, cp)
         {
             Name = name;
             HP = hp;

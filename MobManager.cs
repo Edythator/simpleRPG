@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace simpleRPG
 {
     class MobManager
     {
         public Mob selectedMob { get; private set; }
-        private static List<Mob> Mobs = new List<Mob>();
+        private List<Mob> Mobs = new List<Mob>();
         private Mob Create(string name, int hp, int cp, int level)
         {
             Mob m = new Mob(name, hp, cp, level);
@@ -23,12 +21,12 @@ namespace simpleRPG
         public void ConstructMobs()
         {
             int mobAmount = CalculateMobAmount();
+            int HighestFighterLevel = Program.FighterManager.GetHighestLevelFighter();
+            int AverageFighterCP = Program.FighterManager.GetFighterAverageCP();
+            int AverageFighterHP = Program.FighterManager.GetFighterAverageHP();
+
             for (int i = 0; i < mobAmount; i++)
             {
-                int HighestFighterLevel = FighterManager.GetHighestLevelFighter();
-                int AverageFighterCP = FighterManager.GetFighterAverageCP();
-                int AverageFighterHP = FighterManager.GetFighterAverageHP();
-
                 string[] namePool = { "yes", "no" };
                 string name = namePool[Program.Rnd.Next(0, namePool.Length - 1)];
 
@@ -49,10 +47,7 @@ namespace simpleRPG
             }
         }
 
-        private void Select(Mob m)
-        {
-            selectedMob = m;
-        }
+        private void Select(Mob m) => selectedMob = m;
         public bool MobsAlive() => Mobs.All(x => x.IsAlive());
     }
 }
