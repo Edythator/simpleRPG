@@ -16,7 +16,7 @@
             return HP > 0;
         }
 
-        public void Fight(Entity enemy, out int damage)
+        public void Attack(Entity enemy, out int damage)
         {
             // implement scaling amount of crit derived from the total CP the character can do and chance of crit
             damage = Program.Rnd.Next(CP - 2, CP + 2);

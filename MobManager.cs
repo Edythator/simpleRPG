@@ -5,6 +5,7 @@ namespace simpleRPG
 {
     class MobManager
     {
+        // samma princip som i FighterManager
         public Mob selectedMob { get; private set; }
         private List<Mob> Mobs = new List<Mob>();
         private Mob Create(string name, int hp, int cp, int level)
@@ -13,11 +14,13 @@ namespace simpleRPG
             Mobs.Add(m);
             return m;
         }
+        // funktion för att kalkylera hur många monster/onda de ska finnas i ett rum/dungeon/whatever
         private int CalculateMobAmount()
         {
             //implement
             return 2;
         }
+        // funktion för att konstrurera de onda/monsterna baserat på den mediana leveln, cp och hp i det goda laget
         public void ConstructMobs()
         {
             int mobAmount = CalculateMobAmount();
@@ -47,7 +50,9 @@ namespace simpleRPG
             }
         }
 
+        // väljer ett main monster
         private void Select(Mob m) => selectedMob = m;
+        // checkar ifall alla lever
         public bool MobsAlive() => Mobs.All(x => x.IsAlive());
     }
 }

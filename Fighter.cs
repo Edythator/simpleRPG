@@ -22,6 +22,7 @@
             XP = xp;
             Faction = faction;
         }
+        // vi vill kunna veta namnet på den onda, ifall den har ett smeknamn eller inte, så vi skriver ut det här i båda fallen
         public string GetPrintableName()
         {
             if (!string.IsNullOrEmpty(Nickname))
