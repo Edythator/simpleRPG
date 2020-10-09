@@ -121,6 +121,10 @@ namespace simpleRPG
         // välj main gubbe fast med en Fighter
         public void Select(Fighter f) => selectedFighter = f;
         // kolla ifall alla lever
-        public bool IsPartyAlive() => fighters.All(x => x.IsAlive());
+        public bool IsPartyAlive() => fighters.Any(x => x.IsAlive());
+
+        public bool IsFighterAlive() => selectedFighter.HP > 0;
+
+        public Fighter FirstAvailableFighter() => fighters.First(x => x.HP > 0);
     }
 }

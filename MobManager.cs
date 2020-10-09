@@ -14,12 +14,14 @@ namespace simpleRPG
             Mobs.Add(m);
             return m;
         }
+
         // funktion för att kalkylera hur många monster/onda de ska finnas i ett rum/dungeon/whatever
         private int CalculateMobAmount()
         {
             //implement
             return 2;
         }
+
         // funktion för att konstrurera de onda/monsterna baserat på den mediana leveln, cp och hp i det goda laget
         public void ConstructMobs()
         {
@@ -33,6 +35,7 @@ namespace simpleRPG
                 string[] namePool = { "yes", "no" };
                 string name = namePool[Program.Rnd.Next(0, namePool.Length - 1)];
 
+                //scale const 20
                 int hp = Program.Rnd.Next(AverageFighterHP - 20, AverageFighterHP + 20);
                 if (hp < 0)
                     hp = 1;

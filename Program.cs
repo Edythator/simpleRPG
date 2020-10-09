@@ -26,10 +26,19 @@ namespace simpleRPG
             // medans båda är vid liv
             while (FighterManager.IsPartyAlive() && mobManager.MobsAlive())
             {
-                // användaren får välja om den vill gå in i strid, eller fixa med sitt gäng
                 Console.Clear();
+
+                // ifall att mainfighter är död
+                if (!FighterManager.IsFighterAlive())
+                {
+                    Console.WriteLine("Main fighter is dead... Swapping to other available fighter");
+                    FighterManager.Select(FighterManager.FirstAvailableFighter());
+                }
+
+                // användaren får välja om den vill gå in i strid, eller fixa med sitt gäng
                 Console.WriteLine("What do you want to do? (c(ontinue)/m(anage))");
                 char c = char.ToLower(Console.ReadKey().KeyChar);
+
                 // ifall använder vill hantera
                 if (c == 'm')
                 {
@@ -47,6 +56,7 @@ namespace simpleRPG
                             FighterManager.Select(idx - 1);
                         else continue;
                     }
+
                     // ifall användaren vill byta namn på main gubben
                     else if (sc == 'r')
                     {
@@ -60,6 +70,7 @@ namespace simpleRPG
                         }
                         FighterManager.selectedFighter.Nickname = nickname;
                     }
+
                     // ifall användaren vill skriva ut alla partymedlemmar
                     else if (sc == 'p')
                     {
@@ -67,9 +78,11 @@ namespace simpleRPG
                         Console.WriteLine("Press any key to go back...");
                         Console.ReadKey();
                     }
+
                     // annars fortsätter vi om användaren inte vill göra något
                     else continue;
                 }
+
                 // vi går in i strid om användaren inte vill hantera sina gubbar
                 else
                 {
