@@ -142,6 +142,10 @@ namespace simpleRPG
         public Fighter FirstAvailableFighter() => fighters.First(x => x.HP > 0);
 
         // healar alla fighters
-        public void HealAllFighters() => fighters.ForEach(x => x.HP = x.MaxHP);
+        public void HealAllFighters()
+        {
+            fighters.ForEach(x => x.HP = x.MaxHP);
+            SaveFighters();
+        }
     }
 }

@@ -5,7 +5,6 @@ namespace simpleRPG
 {
     class Program
     {
-        //TODO: implement some kind of function to calculate amount of money loss&gain scaled to level
         //TODO: implement functions to scale mobs to fighter levels
         //TODO: implement finding fighters n stuff
         //TODO: fix some kind of "encryption" for saving
