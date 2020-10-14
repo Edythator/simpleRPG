@@ -11,15 +11,14 @@ namespace simpleRPG
         //TODO: fix some kind of "encryption" for saving
 
         // skapar en ny statisk instans av Random som kan användas vartsom; det är dåligt att konstruktera flera randoms i ett och samma program, så jag gör det här
-        // gör samtidigt en ny statisk klass av fightermanager, vilket är riktigt illa och ska fixas
         public static Random Rnd = new Random();
-        public static FighterManager FighterManager = new FighterManager();
-        private static void Main(string[] args)
+        private static void Main()
         {
-            // skapar de onda, och konstrurerar båda
+            // skapar de onda & de goda, och konstrurerar båda
+            FighterManager FighterManager = new FighterManager();
             MobManager mobManager = new MobManager();
             FighterManager.LoadFighters();
-            mobManager.ConstructMobs();
+            mobManager.ConstructMobs(FighterManager);
             bool turn = true;
             int money = 100;
 
@@ -29,7 +28,7 @@ namespace simpleRPG
                 Console.Clear();
 
                 // ifall att mainfighter är död
-                if (!FighterManager.IsFighterAlive())
+                if (!FighterManager.IsMainFighterAlive())
                 {
                     Console.WriteLine("Main fighter is dead... Swapping to other available fighter");
                     FighterManager.Select(FighterManager.FirstAvailableFighter());
@@ -39,7 +38,7 @@ namespace simpleRPG
                 Console.WriteLine("What do you want to do? (c(ontinue)/m(anage))");
                 char c = char.ToLower(Console.ReadKey().KeyChar);
 
-                // ifall använder vill hantera
+                // ifall användaren vill hantera
                 if (c == 'm')
                 {
                     Console.Clear();
@@ -97,6 +96,7 @@ namespace simpleRPG
                         Thread.Sleep(1000);
                         turn = false;
                     }
+
                     // ifall det inte är användarens tur så attackerar istället de onda
                     else
                     {
@@ -106,6 +106,7 @@ namespace simpleRPG
                         Thread.Sleep(1000);
                         turn = true;
                     }
+
                     // sparar de goda för varje omgång i loopen
                     FighterManager.SaveFighters();
                 }
@@ -115,19 +116,20 @@ namespace simpleRPG
             if (FighterManager.IsPartyAlive())
             {
                 Console.WriteLine("\nYou won! :D");
-                int moneyGain = (int)(money * 0.03);
+                int moneyGain = (int)Math.Pow(mobManager.GetAverageLevel(), Math.Log(10, 3));
                 money += moneyGain;
                 Console.WriteLine("\nYou gained " + moneyGain + " money.");
             }
             else
             {
                 Console.WriteLine("\nYou lost! :(");
-                int moneyLoss = (int)(money * 0.03);
+                int moneyLoss = (int)Math.Pow(mobManager.GetAverageLevel(), Math.Log(10, 3));
                 money -= moneyLoss;
                 Console.WriteLine("\nYou lost " + moneyLoss + " money.");
-                Console.WriteLine("Game will automatically exit in 2 seconds...");
+                Console.WriteLine("Healing your characters to max HP...");
+                FighterManager.HealAllFighters();
                 Thread.Sleep(2000);
-                return;
+                Main();
             }
         }
     }

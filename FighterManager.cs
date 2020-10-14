@@ -24,15 +24,15 @@ namespace simpleRPG
                         if (!string.IsNullOrEmpty(s))
                         {
                             string[] fighterProperties = s.Split(';');
-                            if (fighterProperties.Length > 6)
+                            if (fighterProperties.Length > 7)
                             {
-                                Create(fighterProperties[0], fighterProperties[1],
-                                    int.Parse(fighterProperties[2]), int.Parse(fighterProperties[3]), int.Parse(fighterProperties[4]), int.Parse(fighterProperties[5]), fighterProperties[6]);
+                                Create(fighterProperties[0], fighterProperties[1], int.Parse(fighterProperties[2]),
+                                    int.Parse(fighterProperties[3]), int.Parse(fighterProperties[4]), int.Parse(fighterProperties[5]), int.Parse(fighterProperties[6]), fighterProperties[7]);
                             }
                             else
                             {
                                 Create(fighterProperties[0], int.Parse(fighterProperties[1]),
-                                    int.Parse(fighterProperties[2]), int.Parse(fighterProperties[3]), int.Parse(fighterProperties[4]), fighterProperties[5]);
+                                    int.Parse(fighterProperties[2]), int.Parse(fighterProperties[3]), int.Parse(fighterProperties[4]), int.Parse(fighterProperties[5]), fighterProperties[6]);
                             }
                         }
                     }
@@ -47,8 +47,9 @@ namespace simpleRPG
             if (GetFighterCount() > 0)
                 Select(0);
             else
-                Select(Create("Default", 10, 10, 1, 1, "Default faction"));
+                Select(Create("Default", 10, 10, 10, 1, 1, "Default faction"));
         }
+
         // sparar gubbarna till en fil
         public void SaveFighters()
         {
@@ -58,9 +59,9 @@ namespace simpleRPG
                 foreach (Fighter f in fighters)
                 {
                     if (string.IsNullOrEmpty(f.Nickname))
-                        buffer.Add($"{f.Name};{f.HP};{f.CP};{f.Level};{f.XP};{f.Faction}");
+                        buffer.Add($"{f.Name};{f.HP};{f.MaxHP};{f.CP};{f.Level};{f.XP};{f.Faction}");
                     else
-                        buffer.Add($"{f.Name};{f.Nickname};{f.HP};{f.CP};{f.Level};{f.XP};{f.Faction}");
+                        buffer.Add($"{f.Name};{f.Nickname};{f.HP};{f.MaxHP};{f.CP};{f.Level};{f.XP};{f.Faction}");
                 }
 
                 File.WriteAllLines("guys", buffer);
@@ -70,8 +71,10 @@ namespace simpleRPG
                 Console.WriteLine("Caught exception: " + e.Message);
             }
         }
+
         // dependency injection
         public int GetFighterCount() => fighters.Count;
+
         // dependency injection
         public int GetFighterAverageHP()
         {
@@ -80,6 +83,7 @@ namespace simpleRPG
                 averageHP += f.HP;
             return averageHP / GetFighterCount();
         }
+
         // dependency injection
         public int GetFighterAverageCP()
         {
@@ -88,22 +92,27 @@ namespace simpleRPG
                 averageCP += f.CP;
             return averageCP / GetFighterCount();
         }
+
         // dependency injection
+
         public int GetHighestLevelFighter() => fighters.OrderByDescending(x => x.Level).First().Level;
+
         // en funktion för att skapa (från OOP-klassen) och lägga till gubbar i listan
-        public Fighter Create(string name, int hp, int cp, int level, int xp, string faction)
+        public Fighter Create(string name, int hp, int maxHP, int cp, int level, int xp, string faction)
         {
-            Fighter f = new Fighter(name, hp, cp, level, xp, faction);
+            Fighter f = new Fighter(name, hp, maxHP, cp, level, xp, faction);
             fighters.Add(f);
             return f;
         }
+
         // detsamma som ovan fast med smeknamn
-        public Fighter Create(string name, string nickname, int hp, int cp, int level, int xp, string faction)
+        public Fighter Create(string name, string nickname, int hp, int maxHP, int cp, int level, int xp, string faction)
         {
-            Fighter f = new Fighter(name, nickname, hp, cp, level, xp, faction);
+            Fighter f = new Fighter(name, nickname, maxHP, hp, cp, level, xp, faction);
             fighters.Add(f);
             return f;
         }
+
         // skriver ut alla gubbar som finns med i, antigen med eller utan smeknamn, listan, bara att man börjar från 1 då det är mer användarvänligt 
         public void PrintFighters()
         {
@@ -116,15 +125,23 @@ namespace simpleRPG
                     Console.WriteLine($"{i + 1}: [{fighters[i].Faction}] {fighters[i].Nickname} ({fighters[i].Name}) | HP: {fighters[i].HP} | CP: {fighters[i].CP} | Level: {fighters[i].Level} | XP: {fighters[i].XP}");
             }
         }
+
         // välj main gubbe med en index
         public void Select(int fighterIdx) => selectedFighter = fighters[fighterIdx];
+
         // välj main gubbe fast med en Fighter
         public void Select(Fighter f) => selectedFighter = f;
+
         // kolla ifall alla lever
         public bool IsPartyAlive() => fighters.Any(x => x.IsAlive());
 
-        public bool IsFighterAlive() => selectedFighter.HP > 0;
+        // kolla ifall main gubben lever
+        public bool IsMainFighterAlive() => selectedFighter.HP > 0;
 
+        // tar den första tillgängliga fightern som lever
         public Fighter FirstAvailableFighter() => fighters.First(x => x.HP > 0);
+
+        // healar alla fighters
+        public void HealAllFighters() => fighters.ForEach(x => x.HP = x.MaxHP);
     }
 }

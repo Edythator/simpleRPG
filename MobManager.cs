@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace simpleRPG
 {
@@ -23,12 +24,12 @@ namespace simpleRPG
         }
 
         // funktion för att konstrurera de onda/monsterna baserat på den mediana leveln, cp och hp i det goda laget
-        public void ConstructMobs()
+        public void ConstructMobs(FighterManager f)
         {
             int mobAmount = CalculateMobAmount();
-            int HighestFighterLevel = Program.FighterManager.GetHighestLevelFighter();
-            int AverageFighterCP = Program.FighterManager.GetFighterAverageCP();
-            int AverageFighterHP = Program.FighterManager.GetFighterAverageHP();
+            int HighestFighterLevel = f.GetHighestLevelFighter();
+            int AverageFighterCP = f.GetFighterAverageCP();
+            int AverageFighterHP = f.GetFighterAverageHP();
 
             for (int i = 0; i < mobAmount; i++)
             {
@@ -55,7 +56,15 @@ namespace simpleRPG
 
         // väljer ett main monster
         private void Select(Mob m) => selectedMob = m;
+
         // checkar ifall alla lever
         public bool MobsAlive() => Mobs.All(x => x.IsAlive());
+
+        public int GetAverageLevel()
+        {
+            int avg = 0;
+            Mobs.ForEach(x => avg += x.HP);
+            return avg;
+        }
     }
 }
