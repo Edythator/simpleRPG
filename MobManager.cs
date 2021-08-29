@@ -1,18 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 
 namespace simpleRPG
 {
-    class MobManager
+    internal sealed class MobManager
     {
         // samma princip som i FighterManager
-        public Mob selectedMob { get; private set; }
-        private List<Mob> Mobs = new List<Mob>();
+        public Mob SelectedMob { get; private set; }
+        private readonly List<Mob> _mobs = new List<Mob>();
         private Mob Create(string name, int hp, int cp, int level)
         {
             Mob m = new Mob(name, hp, cp, level);
-            Mobs.Add(m);
+            _mobs.Add(m);
             return m;
         }
 
@@ -27,9 +26,9 @@ namespace simpleRPG
         public void ConstructMobs(FighterManager f)
         {
             int mobAmount = CalculateMobAmount();
-            int HighestFighterLevel = f.GetHighestLevelFighter();
-            int AverageFighterCP = f.GetFighterAverageCP();
-            int AverageFighterHP = f.GetFighterAverageHP();
+            int highestFighterLevel = f.GetHighestLevelFighter();
+            int highestFighterCP = f.GetFighterAverageCP();
+            int highestFighterHP = f.GetFighterAverageHP();
 
             for (int i = 0; i < mobAmount; i++)
             {
@@ -37,13 +36,13 @@ namespace simpleRPG
                 string name = namePool[Program.Rnd.Next(0, namePool.Length - 1)];
 
                 //scale const 20
-                int hp = Program.Rnd.Next(AverageFighterHP - 20, AverageFighterHP + 20);
+                int hp = Program.Rnd.Next(highestFighterHP - 20, highestFighterHP + 20);
                 if (hp < 0)
                     hp = 1;
-                int cp = Program.Rnd.Next(AverageFighterCP - 20, AverageFighterCP + 20);
+                int cp = Program.Rnd.Next(highestFighterCP - 20, highestFighterCP + 20);
                 if (cp < 0)
                     cp = 1;
-                int level = Program.Rnd.Next(HighestFighterLevel - 3, HighestFighterLevel + 2);
+                int level = Program.Rnd.Next(highestFighterLevel - 3, highestFighterLevel + 2);
                 if (level < 0)
                     level = 1;
 
@@ -55,15 +54,15 @@ namespace simpleRPG
         }
 
         // väljer ett main monster
-        private void Select(Mob m) => selectedMob = m;
+        private void Select(Mob m) => SelectedMob = m;
 
         // checkar ifall alla lever
-        public bool MobsAlive() => Mobs.All(x => x.IsAlive());
+        public bool MobsAlive() => _mobs.All(x => x.IsAlive());
 
         public int GetAverageLevel()
         {
             int avg = 0;
-            Mobs.ForEach(x => avg += x.HP);
+            _mobs.ForEach(x => avg += x.HP);
             return avg;
         }
     }

@@ -5,11 +5,11 @@ using System.IO;
 
 namespace simpleRPG
 {
-    class FighterManager
+    public class FighterManager
     {
         // gör en public gubbe som vilken klass som helst har tillgång till att läsa, men inte lägga ett värde på, och gör en samtidigt en lista av gubbar som då är partyt
-        public Fighter selectedFighter { get; private set; }
-        private List<Fighter> fighters = new List<Fighter>();
+        public Fighter SelectedFighter { get; private set; }
+        private readonly List<Fighter> _fighters = new();
 
         //försöker ladda gubbarna från en fil, ifall den finns, och lägger in de i listan, ifall filen inte finns så skapar jag en enstaka default gubbe
         public void LoadFighters()
@@ -21,19 +21,18 @@ namespace simpleRPG
                     string[] buffer = File.ReadAllLines("guys");
                     foreach (string s in buffer)
                     {
-                        if (!string.IsNullOrEmpty(s))
+                        if (string.IsNullOrEmpty(s)) continue;
+                        
+                        string[] fighterProperties = s.Split(';');
+                        if (fighterProperties.Length > 7)
                         {
-                            string[] fighterProperties = s.Split(';');
-                            if (fighterProperties.Length > 7)
-                            {
-                                Create(fighterProperties[0], fighterProperties[1], int.Parse(fighterProperties[2]),
-                                    int.Parse(fighterProperties[3]), int.Parse(fighterProperties[4]), int.Parse(fighterProperties[5]), int.Parse(fighterProperties[6]), fighterProperties[7]);
-                            }
-                            else
-                            {
-                                Create(fighterProperties[0], int.Parse(fighterProperties[1]),
-                                    int.Parse(fighterProperties[2]), int.Parse(fighterProperties[3]), int.Parse(fighterProperties[4]), int.Parse(fighterProperties[5]), fighterProperties[6]);
-                            }
+                            Create(fighterProperties[0], fighterProperties[1], int.Parse(fighterProperties[2]),
+                                int.Parse(fighterProperties[3]), int.Parse(fighterProperties[4]), int.Parse(fighterProperties[5]), int.Parse(fighterProperties[6]), fighterProperties[7]);
+                        }
+                        else
+                        {
+                            Create(fighterProperties[0], int.Parse(fighterProperties[1]),
+                                int.Parse(fighterProperties[2]), int.Parse(fighterProperties[3]), int.Parse(fighterProperties[4]), int.Parse(fighterProperties[5]), fighterProperties[6]);
                         }
                     }
                 }     
@@ -55,15 +54,10 @@ namespace simpleRPG
         {
             try
             {
-                List<string> buffer = new List<string>();
-                foreach (Fighter f in fighters)
-                {
-                    if (string.IsNullOrEmpty(f.Nickname))
-                        buffer.Add($"{f.Name};{f.HP};{f.MaxHP};{f.CP};{f.Level};{f.XP};{f.Faction}");
-                    else
-                        buffer.Add($"{f.Name};{f.Nickname};{f.HP};{f.MaxHP};{f.CP};{f.Level};{f.XP};{f.Faction}");
-                }
-
+                IEnumerable<string> buffer = _fighters.Select(f => string.IsNullOrEmpty(f.Nickname)
+                        ? $"{f.Name};{f.HP};{f.MaxHP};{f.CP};{f.Level};{f.XP};{f.Faction}"
+                        : $"{f.Name};{f.Nickname};{f.HP};{f.MaxHP};{f.CP};{f.Level};{f.XP};{f.Faction}");
+                
                 File.WriteAllLines("guys", buffer);
             }
             catch (Exception e)
@@ -71,80 +65,58 @@ namespace simpleRPG
                 Console.WriteLine("Caught exception: " + e.Message);
             }
         }
-
-        // dependency injection
-        public int GetFighterCount() => fighters.Count;
-
-        // dependency injection
-        public int GetFighterAverageHP()
-        {
-            int averageHP = 0;
-            foreach (Fighter f in fighters)
-                averageHP += f.HP;
-            return averageHP / GetFighterCount();
-        }
-
-        // dependency injection
-        public int GetFighterAverageCP()
-        {
-            int averageCP = 0;
-            foreach (Fighter f in fighters)
-                averageCP += f.CP;
-            return averageCP / GetFighterCount();
-        }
-
-        // dependency injection
-
-        public int GetHighestLevelFighter() => fighters.OrderByDescending(x => x.Level).First().Level;
+        
+        public int GetFighterAverageHP() => (int)_fighters.Average(f => f.HP);
+        public int GetFighterAverageCP() => (int)_fighters.Average(f => f.CP);
+        public int GetHighestLevelFighter() => _fighters.OrderByDescending(x => x.Level).First().Level;
+        private int GetFighterCount() => _fighters.Count;
 
         // en funktion för att skapa (från OOP-klassen) och lägga till gubbar i listan
-        public Fighter Create(string name, int hp, int maxHP, int cp, int level, int xp, string faction)
+        private Fighter Create(string name, int hp, int maxHP, int cp, int level, int xp, string faction)
         {
-            Fighter f = new Fighter(name, hp, maxHP, cp, level, xp, faction);
-            fighters.Add(f);
+            Fighter f = new(name, hp, maxHP, cp, level, xp, faction);
+            _fighters.Add(f);
             return f;
         }
 
         // detsamma som ovan fast med smeknamn
-        public Fighter Create(string name, string nickname, int hp, int maxHP, int cp, int level, int xp, string faction)
+        private void Create(string name, string nickname, int hp, int maxHP, int cp, int level, int xp, string faction)
         {
-            Fighter f = new Fighter(name, nickname, maxHP, hp, cp, level, xp, faction);
-            fighters.Add(f);
-            return f;
+            Fighter f = new(name, hp, maxHP, cp, level, xp, faction, nickname);
+            _fighters.Add(f);
         }
 
         // skriver ut alla gubbar som finns med i, antigen med eller utan smeknamn, listan, bara att man börjar från 1 då det är mer användarvänligt 
         public void PrintFighters()
         {
             Console.Clear();
-            for (int i = 0; i < fighters.Count; i++)
+            for (int i = 0; i < _fighters.Count; i++)
             {
-                if (string.IsNullOrEmpty(fighters[i].Nickname))
-                    Console.WriteLine($"{i + 1}: [{fighters[i].Faction}] {fighters[i].Name} | HP: {fighters[i].HP} | CP: {fighters[i].CP} | Level: {fighters[i].Level} | XP: {fighters[i].XP}");
-                else
-                    Console.WriteLine($"{i + 1}: [{fighters[i].Faction}] {fighters[i].Nickname} ({fighters[i].Name}) | HP: {fighters[i].HP} | CP: {fighters[i].CP} | Level: {fighters[i].Level} | XP: {fighters[i].XP}");
+                Console.WriteLine(string.IsNullOrEmpty(_fighters[i].Nickname)
+                    ? $"{i + 1}: [{_fighters[i].Faction}] {_fighters[i].Name} | HP: {_fighters[i].HP} | CP: {_fighters[i].CP} | Level: {_fighters[i].Level} | XP: {_fighters[i].XP}"
+                    : $"{i + 1}: [{_fighters[i].Faction}] {_fighters[i].Nickname} ({_fighters[i].Name}) | HP: {_fighters[i].HP} | CP: {_fighters[i].CP} | Level: {_fighters[i].Level} | XP: {_fighters[i].XP}");
             }
         }
 
         // välj main gubbe med en index
-        public void Select(int fighterIdx) => selectedFighter = fighters[fighterIdx];
+        public void Select(int fighterIdx) => SelectedFighter = _fighters[fighterIdx];
 
         // välj main gubbe fast med en Fighter
-        public void Select(Fighter f) => selectedFighter = f;
+        public void Select(Fighter f) => SelectedFighter = f;
 
         // kolla ifall alla lever
-        public bool IsPartyAlive() => fighters.Any(x => x.IsAlive());
+        public bool IsPartyAlive() => _fighters.Any(x => x.IsAlive());
 
         // kolla ifall main gubben lever
-        public bool IsMainFighterAlive() => selectedFighter.HP > 0;
+        public bool IsMainFighterAlive() => SelectedFighter.HP > 0;
 
         // tar den första tillgängliga fightern som lever
-        public Fighter FirstAvailableFighter() => fighters.First(x => x.HP > 0);
+        public Fighter FirstAvailableFighter() => _fighters.First(x => x.HP > 0);
 
         // healar alla fighters
         public void HealAllFighters()
         {
-            fighters.ForEach(x => x.HP = x.MaxHP);
+            _fighters.ForEach(x => x.HP = x.MaxHP);
             SaveFighters();
         }
     }

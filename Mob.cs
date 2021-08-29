@@ -1,15 +1,15 @@
 ﻿namespace simpleRPG
 {
-    class Mob : Entity
+    internal class Mob : FightingEntity
     {
         // enkel OOP klass för en ond
-        public int Level;
-        public Mob(string name, int hp, int cp, int level) : base(name, hp, cp)
+        private int _level;
+        public Mob(string name, int hp, int cp, int level)
         {
             Name = name;
             HP = hp;
             CP = cp;
-            Level = level;
+            _level = level;
         }
     }
 }
