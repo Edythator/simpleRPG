@@ -40,7 +40,7 @@ namespace simpleRPG
             if (GetFighterCount() > 0)
                 Select(0);
             else 
-                Select(Create("Default", 10, 10, 10, 1, 1, "Default faction", new Wearable("Literally nothing", 0, 1000)));
+                Select(Create("Default", 10, 10, 10, 1, 1, "Default faction", new Wearable("Literally nothing", 0, 10)));
         }
 
         // sparar gubbarna till en fil
@@ -53,7 +53,7 @@ namespace simpleRPG
             }
             catch (Exception e)
             {
-                Console.WriteLine("Caught exception: " + e.Message);
+                Console.WriteLine("Couldn't save file:\n" + e.Message);
             }
         }
         

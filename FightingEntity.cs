@@ -3,7 +3,6 @@
     public abstract class FightingEntity : Entity
     {
         protected internal int CP { get; protected init; }
-
         public virtual void Attack(Entity enemy, out int damage)
         {
             // implement scaling amount of crit derived from the total CP the character can do and chance of crit

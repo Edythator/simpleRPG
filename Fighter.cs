@@ -12,7 +12,7 @@
         public Fighter(string name, int hp, int maxHP, int cp, int level, int xp, string faction, Wearable wearable, string nickname = "")
         {
             Name = name;
-            HP = hp;
+            HP = hp + wearable.HP;
             MaxHP = maxHP;
             Nickname = nickname;
             CP = cp;
@@ -21,15 +21,13 @@
             Faction = faction;
             Wearable = wearable;
         }
-        
         public override void Attack(Entity enemy, out int damage)
         {
-            int itemBonus = Wearable.CP + Wearable.HP;
             int temp = 0;
             
             // implement scaling amount of crit derived from the total CP the character can do and chance of crit
             damage = Program.Rnd.Next(CP - 5, CP + 5);
-            damage += itemBonus;
+            damage += Wearable.CP;
             if (damage > enemy.HP)
             {
                 temp = damage;

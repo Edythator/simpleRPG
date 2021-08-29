@@ -122,10 +122,10 @@ namespace simpleRPG
             }
             else
             {
-                Console.WriteLine("You lost! :(");
+                Console.WriteLine("\nYou lost! :(");
                 int moneyLoss = (int)Math.Pow(mobManager.GetAverageLevel(), Math.Log(10, 3));
                 money -= moneyLoss;
-                Console.WriteLine("\nYou lost " + moneyLoss + " money.");
+                Console.WriteLine("You lost " + moneyLoss + " money.");
                 Console.WriteLine("Healing your characters to max HP...");
                 fighterManager.HealAllFighters();
                 Thread.Sleep(2000);
