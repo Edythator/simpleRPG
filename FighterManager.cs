@@ -24,20 +24,14 @@ namespace simpleRPG
                         if (string.IsNullOrEmpty(s)) continue;
                         
                         string[] fighterProperties = s.Split(';');
-                        if (fighterProperties.Length > 7)
-                        {
-                            Create(fighterProperties[0], fighterProperties[1], int.Parse(fighterProperties[2]),
-                                int.Parse(fighterProperties[3]), int.Parse(fighterProperties[4]), int.Parse(fighterProperties[5]), int.Parse(fighterProperties[6]), fighterProperties[7]);
-                        }
-                        else
-                        {
-                            Create(fighterProperties[0], int.Parse(fighterProperties[1]),
-                                int.Parse(fighterProperties[2]), int.Parse(fighterProperties[3]), int.Parse(fighterProperties[4]), int.Parse(fighterProperties[5]), fighterProperties[6]);
-                        }
+                        Wearable w = new(fighterProperties[8], int.Parse(fighterProperties[9]), int.Parse(fighterProperties[10]));
+                        Create(fighterProperties[0], fighterProperties[1], int.Parse(fighterProperties[2]),
+                            int.Parse(fighterProperties[3]), int.Parse(fighterProperties[4]), int.Parse(fighterProperties[5]), 
+                            int.Parse(fighterProperties[6]), fighterProperties[7], w);
+        
                     }
                 }     
             }
-
             catch (Exception e)
             {
                 Console.WriteLine("Caught exception: " + e.Message);
@@ -45,20 +39,17 @@ namespace simpleRPG
 
             if (GetFighterCount() > 0)
                 Select(0);
-            else
-                Select(Create("Default", 10, 10, 10, 1, 1, "Default faction"));
+            else 
+                Select(Create("Default", 10, 10, 10, 1, 1, "Default faction", new Wearable("Literally nothing", 0, 1000)));
         }
 
         // sparar gubbarna till en fil
         public void SaveFighters()
         {
+            IEnumerable<string> fighters = _fighters.Select(f => $"{f.Name};{f.Nickname};{f.HP};{f.MaxHP};{f.CP};{f.Level};{f.XP};{f.Faction};{f.Wearable.Name};{f.Wearable.HP};{f.Wearable.CP}");
             try
             {
-                IEnumerable<string> buffer = _fighters.Select(f => string.IsNullOrEmpty(f.Nickname)
-                        ? $"{f.Name};{f.HP};{f.MaxHP};{f.CP};{f.Level};{f.XP};{f.Faction}"
-                        : $"{f.Name};{f.Nickname};{f.HP};{f.MaxHP};{f.CP};{f.Level};{f.XP};{f.Faction}");
-                
-                File.WriteAllLines("guys", buffer);
+                File.WriteAllLines("guys", fighters);
             }
             catch (Exception e)
             {
@@ -72,17 +63,17 @@ namespace simpleRPG
         private int GetFighterCount() => _fighters.Count;
 
         // en funktion för att skapa (från OOP-klassen) och lägga till gubbar i listan
-        private Fighter Create(string name, int hp, int maxHP, int cp, int level, int xp, string faction)
+        private Fighter Create(string name, int hp, int maxHP, int cp, int level, int xp, string faction, Wearable wearable)
         {
-            Fighter f = new(name, hp, maxHP, cp, level, xp, faction);
+            Fighter f = new(name, hp, maxHP, cp, level, xp, faction, wearable);
             _fighters.Add(f);
             return f;
         }
 
         // detsamma som ovan fast med smeknamn
-        private void Create(string name, string nickname, int hp, int maxHP, int cp, int level, int xp, string faction)
+        private void Create(string name, string nickname, int hp, int maxHP, int cp, int level, int xp, string faction, Wearable wearable)
         {
-            Fighter f = new(name, hp, maxHP, cp, level, xp, faction, nickname);
+            Fighter f = new(name, hp, maxHP, cp, level, xp, faction, wearable, nickname);
             _fighters.Add(f);
         }
 
@@ -93,8 +84,11 @@ namespace simpleRPG
             for (int i = 0; i < _fighters.Count; i++)
             {
                 Console.WriteLine(string.IsNullOrEmpty(_fighters[i].Nickname)
-                    ? $"{i + 1}: [{_fighters[i].Faction}] {_fighters[i].Name} | HP: {_fighters[i].HP} | CP: {_fighters[i].CP} | Level: {_fighters[i].Level} | XP: {_fighters[i].XP}"
-                    : $"{i + 1}: [{_fighters[i].Faction}] {_fighters[i].Nickname} ({_fighters[i].Name}) | HP: {_fighters[i].HP} | CP: {_fighters[i].CP} | Level: {_fighters[i].Level} | XP: {_fighters[i].XP}");
+                    ? $"{i + 1}: [{_fighters[i].Faction}] {_fighters[i].Name} | HP: {_fighters[i].HP} | CP: {_fighters[i].CP} | Level: {_fighters[i].Level} | XP: {_fighters[i].XP}" +
+                      $" | Wearable Name: {_fighters[i].Wearable.Name} | Wearable HP: {_fighters[i].Wearable.HP} | Wearable CP: {_fighters[i].Wearable.CP}"
+                      
+                    : $"{i + 1}: [{_fighters[i].Faction}] {_fighters[i].Nickname} ({_fighters[i].Name}) | HP: {_fighters[i].HP} | CP: {_fighters[i].CP} | Level: {_fighters[i].Level} | XP: {_fighters[i].XP}" +
+                      $" | Wearable Name: {_fighters[i].Wearable.Name} | Wearable HP: {_fighters[i].Wearable.HP} | Wearable CP: {_fighters[i].Wearable.CP}");
             }
         }
 

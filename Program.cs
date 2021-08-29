@@ -118,6 +118,7 @@ namespace simpleRPG
                 int moneyGain = (int)Math.Pow(mobManager.GetAverageLevel(), Math.Log(10, 3));
                 money += moneyGain;
                 Console.WriteLine("You gained " + moneyGain + " money.");
+                Thread.Sleep(2000);
             }
             else
             {
